@@ -46,17 +46,18 @@ export function useEntries() {
 
   const addCategory = useCallback((category: string) => {
     setState((prev: AppState) => {
-      if (prev.customCategories.includes(category)) return prev;
-      return { ...prev, customCategories: [...prev.customCategories, category] };
+      if (prev.categories.includes(category)) return prev;
+      return { ...prev, categories: [...prev.categories, category] };
     });
   }, [setState]);
 
   const editCategory = useCallback((oldName: string, newName: string) => {
     setState((prev: AppState) => ({
-      customCategories: prev.customCategories.map((c) => (c === oldName ? newName : c)),
-      // 既存エントリのカテゴリ名も一括更新
+      categories: prev.categories.map((c) => (c === oldName ? newName : c)),
       entries: prev.entries.map((e) =>
-        e.category === oldName ? { ...e, category: newName, updatedAt: new Date().toISOString() } : e
+        e.category === oldName
+          ? { ...e, category: newName, updatedAt: new Date().toISOString() }
+          : e
       ),
     }));
   }, [setState]);
@@ -64,13 +65,13 @@ export function useEntries() {
   const deleteCategory = useCallback((category: string) => {
     setState((prev: AppState) => ({
       ...prev,
-      customCategories: prev.customCategories.filter((c) => c !== category),
+      categories: prev.categories.filter((c) => c !== category),
     }));
   }, [setState]);
 
   return {
     entries: state.entries,
-    customCategories: state.customCategories,
+    categories: state.categories,
     addEntry,
     updateEntry,
     deleteEntry,

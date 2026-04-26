@@ -10,7 +10,7 @@ type Tab = 'form' | 'list' | 'analytics' | 'categories';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
-  const { entries, customCategories, addEntry, updateEntry, deleteEntry, addCategory, editCategory, deleteCategory } = useEntries();
+  const { entries, categories, addEntry, updateEntry, deleteEntry, addCategory, editCategory, deleteCategory } = useEntries();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,7 +28,7 @@ export default function App() {
       <main className="max-w-2xl mx-auto px-4 py-6">
         {activeTab === 'form' && (
           <EntryForm
-            customCategories={customCategories}
+            categories={categories}
             onAddCategory={addCategory}
             onSubmit={addEntry}
           />
@@ -36,7 +36,7 @@ export default function App() {
         {activeTab === 'list' && (
           <EntryList
             entries={entries}
-            customCategories={customCategories}
+            categories={categories}
             onAddCategory={addCategory}
             onUpdate={updateEntry}
             onDelete={deleteEntry}
@@ -47,7 +47,7 @@ export default function App() {
         )}
         {activeTab === 'categories' && (
           <CategoryManager
-            customCategories={customCategories}
+            categories={categories}
             onAdd={addCategory}
             onEdit={editCategory}
             onDelete={deleteCategory}

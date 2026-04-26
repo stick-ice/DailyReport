@@ -9,13 +9,13 @@ import type { NewEntryInput } from '../../hooks/useEntries';
 
 interface Props {
   entries: TaskEntry[];
-  customCategories: string[];
+  categories: string[];
   onAddCategory: (cat: string) => void;
   onUpdate: (id: string, input: NewEntryInput) => void;
   onDelete: (id: string) => void;
 }
 
-export function EntryList({ entries, customCategories, onAddCategory, onUpdate, onDelete }: Props) {
+export function EntryList({ entries, categories, onAddCategory, onUpdate, onDelete }: Props) {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [editTarget, setEditTarget] = useState<TaskEntry | null>(null);
@@ -58,7 +58,7 @@ export function EntryList({ entries, customCategories, onAddCategory, onUpdate, 
     return (
       <div className="space-y-4">
         <EntryForm
-          customCategories={customCategories}
+          categories={categories}
           onAddCategory={onAddCategory}
           onSubmit={handleUpdate}
           editTarget={editTarget}
@@ -74,7 +74,7 @@ export function EntryList({ entries, customCategories, onAddCategory, onUpdate, 
         <EntryFilter
           filterMonth={filterMonth}
           filterCategory={filterCategory}
-          customCategories={customCategories}
+          categories={categories}
           availableMonths={availableMonths}
           onMonthChange={setFilterMonth}
           onCategoryChange={setFilterCategory}

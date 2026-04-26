@@ -7,7 +7,7 @@ import type { NewEntryInput } from '../../hooks/useEntries';
 import type { TaskEntry } from '../../types';
 
 interface Props {
-  customCategories: string[];
+  categories: string[];
   onAddCategory: (cat: string) => void;
   onSubmit: (input: NewEntryInput) => void;
   editTarget?: TaskEntry | null;
@@ -30,7 +30,7 @@ const emptyForm = (): NewEntryInput => ({
   description: '',
 });
 
-export function EntryForm({ customCategories, onAddCategory, onSubmit, editTarget, onCancelEdit }: Props) {
+export function EntryForm({ categories, onAddCategory, onSubmit, editTarget, onCancelEdit }: Props) {
   const [form, setForm] = useState<NewEntryInput>(() =>
     editTarget
       ? {
@@ -120,7 +120,7 @@ export function EntryForm({ customCategories, onAddCategory, onSubmit, editTarge
         {/* カテゴリ */}
         <CategorySelect
           value={form.category}
-          customCategories={customCategories}
+          categories={categories}
           onChange={(v) => set('category', v)}
           onAddCategory={onAddCategory}
           error={errors.category}

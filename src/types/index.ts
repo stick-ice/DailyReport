@@ -12,7 +12,7 @@ export interface TaskEntry {
 
 export interface AppState {
   entries: TaskEntry[];
-  customCategories: string[];
+  categories: string[];
 }
 
 export interface MonthlyAggregate {

@@ -1,9 +1,7 @@
-import { PREDEFINED_CATEGORIES } from '../../constants/categories';
-
 interface Props {
   filterMonth: string;
   filterCategory: string;
-  customCategories: string[];
+  categories: string[];
   availableMonths: string[];
   onMonthChange: (month: string) => void;
   onCategoryChange: (category: string) => void;
@@ -12,16 +10,11 @@ interface Props {
 export function EntryFilter({
   filterMonth,
   filterCategory,
-  customCategories,
+  categories,
   availableMonths,
   onMonthChange,
   onCategoryChange,
 }: Props) {
-  const allCategories = [
-    ...PREDEFINED_CATEGORIES,
-    ...customCategories.filter((c) => !PREDEFINED_CATEGORIES.includes(c)),
-  ];
-
   return (
     <div className="flex gap-3 flex-wrap">
       <div>
@@ -45,7 +38,7 @@ export function EntryFilter({
           className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">すべて</option>
-          {allCategories.map((c) => (
+          {categories.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>

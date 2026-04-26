@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { PREDEFINED_CATEGORIES } from '../../constants/categories';
 
 interface Props {
   value: string;
-  customCategories: string[];
+  categories: string[];
   onChange: (value: string) => void;
   onAddCategory: (category: string) => void;
   error?: string;
@@ -11,13 +10,9 @@ interface Props {
 
 const CUSTOM_SENTINEL = '__custom__';
 
-export function CategorySelect({ value, customCategories, onChange, onAddCategory, error }: Props) {
+export function CategorySelect({ value, categories, onChange, onAddCategory, error }: Props) {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customInput, setCustomInput] = useState('');
-
-  const allCategories = [...PREDEFINED_CATEGORIES, ...customCategories.filter(
-    (c) => !PREDEFINED_CATEGORIES.includes(c)
-  )];
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === CUSTOM_SENTINEL) {
@@ -59,10 +54,10 @@ export function CategorySelect({ value, customCategories, onChange, onAddCategor
         }`}
       >
         <option value="">選択してください</option>
-        {allCategories.map((cat) => (
+        {categories.map((cat) => (
           <option key={cat} value={cat}>{cat}</option>
         ))}
-        <option value={CUSTOM_SENTINEL}>+ カスタムカテゴリを追加...</option>
+        <option value={CUSTOM_SENTINEL}>+ カテゴリを追加...</option>
       </select>
       {showCustomInput && (
         <div className="mt-2 flex gap-2">
