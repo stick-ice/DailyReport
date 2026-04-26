@@ -1,7 +1,6 @@
 import type { TaskEntry } from '../types';
-import { formatDuration } from './time';
 
-const HEADERS = ['日付', '開始時刻', '終了時刻', '所要時間', 'カテゴリ', '業務概要'];
+const HEADERS = ['日付', '開始時刻', '終了時刻', '所要時間(分)', 'カテゴリ', '業務概要'];
 
 function escapeCsv(value: string): string {
   // ダブルクォート・カンマ・改行を含む場合はクォートで囲む
@@ -22,7 +21,7 @@ export function exportToCsv(entries: TaskEntry[], filename: string): void {
           e.date,
           e.startTime,
           e.endTime,
-          formatDuration(e.durationMinutes),
+          e.durationMinutes,
           escapeCsv(e.category),
           escapeCsv(e.description),
         ].join(',')
