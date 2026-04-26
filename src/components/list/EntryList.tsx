@@ -5,6 +5,7 @@ import { EntryFilter } from './EntryFilter';
 import { EntryForm } from '../form/EntryForm';
 import { formatDateJa, getYearMonth } from '../../utils/time';
 import { getAvailableMonths } from '../../utils/aggregate';
+import { exportToCsv } from '../../utils/export';
 import type { NewEntryInput } from '../../hooks/useEntries';
 
 interface Props {
@@ -68,9 +69,16 @@ export function EntryList({ entries, categories, onAddCategory, onUpdate, onDele
     );
   }
 
+  const handleExport = () => {
+    const isFiltered = filterMonth || filterCategory;
+    const target = isFiltered ? filtered : entries;
+    const suffix = filterMonth ? `_${filterMonth}` : '';
+    exportToCsv(target, `業務日報${suffix}.csv`);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3">
         <EntryFilter
           filterMonth={filterMonth}
           filterCategory={filterCategory}
@@ -79,6 +87,15 @@ export function EntryList({ entries, categories, onAddCategory, onUpdate, onDele
           onMonthChange={setFilterMonth}
           onCategoryChange={setFilterCategory}
         />
+        <div className="flex justify-end">
+          <button
+            onClick={handleExport}
+            disabled={entries.length === 0}
+            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            CSVエクスポート {filterMonth || filterCategory ? '(絞り込み中)' : '(全件)'}
+          </button>
+        </div>
       </div>
 
       {grouped.length === 0 ? (
