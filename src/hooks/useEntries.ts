@@ -51,6 +51,23 @@ export function useEntries() {
     });
   }, [setState]);
 
+  const editCategory = useCallback((oldName: string, newName: string) => {
+    setState((prev: AppState) => ({
+      customCategories: prev.customCategories.map((c) => (c === oldName ? newName : c)),
+      // 既存エントリのカテゴリ名も一括更新
+      entries: prev.entries.map((e) =>
+        e.category === oldName ? { ...e, category: newName, updatedAt: new Date().toISOString() } : e
+      ),
+    }));
+  }, [setState]);
+
+  const deleteCategory = useCallback((category: string) => {
+    setState((prev: AppState) => ({
+      ...prev,
+      customCategories: prev.customCategories.filter((c) => c !== category),
+    }));
+  }, [setState]);
+
   return {
     entries: state.entries,
     customCategories: state.customCategories,
@@ -58,5 +75,7 @@ export function useEntries() {
     updateEntry,
     deleteEntry,
     addCategory,
+    editCategory,
+    deleteCategory,
   };
 }

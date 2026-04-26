@@ -1,4 +1,4 @@
-type Tab = 'form' | 'list' | 'analytics';
+type Tab = 'form' | 'list' | 'analytics' | 'categories';
 
 interface Props {
   active: Tab;
@@ -9,6 +9,7 @@ const tabs: { id: Tab; label: string }[] = [
   { id: 'form', label: '入力' },
   { id: 'list', label: '一覧' },
   { id: 'analytics', label: '分析' },
+  { id: 'categories', label: 'カテゴリ' },
 ];
 
 export function TabNav({ active, onChange }: Props) {

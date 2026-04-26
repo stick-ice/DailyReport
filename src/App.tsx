@@ -3,13 +3,14 @@ import { TabNav } from './components/layout/TabNav';
 import { EntryForm } from './components/form/EntryForm';
 import { EntryList } from './components/list/EntryList';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
+import { CategoryManager } from './components/categories/CategoryManager';
 import { useEntries } from './hooks/useEntries';
 
-type Tab = 'form' | 'list' | 'analytics';
+type Tab = 'form' | 'list' | 'analytics' | 'categories';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('form');
-  const { entries, customCategories, addEntry, updateEntry, deleteEntry, addCategory } = useEntries();
+  const { entries, customCategories, addEntry, updateEntry, deleteEntry, addCategory, editCategory, deleteCategory } = useEntries();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,6 +44,14 @@ export default function App() {
         )}
         {activeTab === 'analytics' && (
           <AnalyticsView entries={entries} />
+        )}
+        {activeTab === 'categories' && (
+          <CategoryManager
+            customCategories={customCategories}
+            onAdd={addCategory}
+            onEdit={editCategory}
+            onDelete={deleteCategory}
+          />
         )}
       </main>
     </div>
