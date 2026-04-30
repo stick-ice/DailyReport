@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { TaskEntry, PlanEntry } from '../../types';
 import { PlanForm } from '../plan/PlanForm';
 import { PlanList } from '../plan/PlanList';
@@ -24,8 +24,19 @@ export function DailyView({
   onAddEntry, onUpdateEntry, onDeleteEntry,
   onAddPlan, onUpdatePlan, onDeletePlan,
 }: Props) {
+  const [filterDate, setFilterDate] = useState('');
   const [editEntry, setEditEntry] = useState<TaskEntry | null>(null);
   const [editPlan, setEditPlan] = useState<PlanEntry | null>(null);
+
+  const filteredEntries = useMemo(
+    () => filterDate ? entries.filter((e) => e.date === filterDate) : entries,
+    [entries, filterDate]
+  );
+
+  const filteredPlans = useMemo(
+    () => filterDate ? plans.filter((p) => p.date === filterDate) : plans,
+    [plans, filterDate]
+  );
 
   const handleEntrySubmit = (input: NewEntryInput) => {
     if (editEntry) {
@@ -56,40 +67,62 @@ export function DailyView({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-      {/* 左列: 作業計画 */}
-      <div className="space-y-4">
-        <h2 className="text-base font-semibold text-gray-700 px-1">作業計画</h2>
-        <PlanForm
-          categories={categories}
-          onAddCategory={onAddCategory}
-          onSubmit={handlePlanSubmit}
-          editTarget={editPlan}
-          onCancelEdit={() => setEditPlan(null)}
+    <div className="space-y-4">
+      {/* 共有日付フィルター */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 flex items-center gap-3">
+        <label className="text-sm font-medium text-gray-700 shrink-0">日付で絞り込み</label>
+        <input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <PlanList
-          plans={plans}
-          onEdit={handleEditPlan}
-          onDelete={onDeletePlan}
-        />
+        {filterDate && (
+          <button
+            onClick={() => setFilterDate('')}
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            クリア
+          </button>
+        )}
       </div>
 
-      {/* 右列: 作業実績 */}
-      <div className="space-y-4">
-        <h2 className="text-base font-semibold text-gray-700 px-1">作業実績</h2>
-        <EntryForm
-          categories={categories}
-          onAddCategory={onAddCategory}
-          onSubmit={handleEntrySubmit}
-          editTarget={editEntry}
-          onCancelEdit={() => setEditEntry(null)}
-        />
-        <EntryList
-          entries={entries}
-          categories={categories}
-          onEdit={handleEditEntry}
-          onDelete={onDeleteEntry}
-        />
+      {/* 2カラム */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* 左列: 作業計画 */}
+        <div className="space-y-4">
+          <h2 className="text-base font-semibold text-gray-700 px-1">作業計画</h2>
+          <PlanForm
+            categories={categories}
+            onAddCategory={onAddCategory}
+            onSubmit={handlePlanSubmit}
+            editTarget={editPlan}
+            onCancelEdit={() => setEditPlan(null)}
+          />
+          <PlanList
+            plans={filteredPlans}
+            onEdit={handleEditPlan}
+            onDelete={onDeletePlan}
+          />
+        </div>
+
+        {/* 右列: 作業実績 */}
+        <div className="space-y-4">
+          <h2 className="text-base font-semibold text-gray-700 px-1">作業実績</h2>
+          <EntryForm
+            categories={categories}
+            onAddCategory={onAddCategory}
+            onSubmit={handleEntrySubmit}
+            editTarget={editEntry}
+            onCancelEdit={() => setEditEntry(null)}
+          />
+          <EntryList
+            entries={filteredEntries}
+            categories={categories}
+            onEdit={handleEditEntry}
+            onDelete={onDeleteEntry}
+          />
+        </div>
       </div>
     </div>
   );
