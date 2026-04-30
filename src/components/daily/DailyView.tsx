@@ -118,7 +118,6 @@ export function DailyView({
           />
           <EntryList
             entries={filteredEntries}
-            categories={categories}
             onEdit={handleEditEntry}
             onDelete={onDeleteEntry}
           />
