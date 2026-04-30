@@ -2,24 +2,20 @@ import { useMemo, useState } from 'react';
 import type { TaskEntry } from '../../types';
 import { EntryCard } from './EntryCard';
 import { EntryFilter } from './EntryFilter';
-import { EntryForm } from '../form/EntryForm';
 import { formatDateJa, getYearMonth } from '../../utils/time';
 import { getAvailableMonths } from '../../utils/aggregate';
 import { exportToCsv } from '../../utils/export';
-import type { NewEntryInput } from '../../hooks/useEntries';
 
 interface Props {
   entries: TaskEntry[];
   categories: string[];
-  onAddCategory: (cat: string) => void;
-  onUpdate: (id: string, input: NewEntryInput) => void;
+  onEdit: (entry: TaskEntry) => void;
   onDelete: (id: string) => void;
 }
 
-export function EntryList({ entries, categories, onAddCategory, onUpdate, onDelete }: Props) {
+export function EntryList({ entries, categories, onEdit, onDelete }: Props) {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
-  const [editTarget, setEditTarget] = useState<TaskEntry | null>(null);
 
   const availableMonths = useMemo(() => getAvailableMonths(entries), [entries]);
 
@@ -31,7 +27,6 @@ export function EntryList({ entries, categories, onAddCategory, onUpdate, onDele
     });
   }, [entries, filterMonth, filterCategory]);
 
-  // 日付ごとにグループ化（降順）
   const grouped = useMemo(() => {
     const map = new Map<string, TaskEntry[]>();
     for (const entry of filtered) {
@@ -39,35 +34,8 @@ export function EntryList({ entries, categories, onAddCategory, onUpdate, onDele
       list.push(entry);
       map.set(entry.date, list);
     }
-    // 日付降順にソート
-    const sorted = Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
-    return sorted;
+    return Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
   }, [filtered]);
-
-  const handleEdit = (entry: TaskEntry) => {
-    setEditTarget(entry);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleUpdate = (input: NewEntryInput) => {
-    if (!editTarget) return;
-    onUpdate(editTarget.id, input);
-    setEditTarget(null);
-  };
-
-  if (editTarget) {
-    return (
-      <div className="space-y-4">
-        <EntryForm
-          categories={categories}
-          onAddCategory={onAddCategory}
-          onSubmit={handleUpdate}
-          editTarget={editTarget}
-          onCancelEdit={() => setEditTarget(null)}
-        />
-      </div>
-    );
-  }
 
   const handleExport = () => {
     const isFiltered = filterMonth || filterCategory;
@@ -112,7 +80,7 @@ export function EntryList({ entries, categories, onAddCategory, onUpdate, onDele
               <EntryCard
                 key={entry.id}
                 entry={entry}
-                onEdit={handleEdit}
+                onEdit={onEdit}
                 onDelete={onDelete}
               />
             ))}

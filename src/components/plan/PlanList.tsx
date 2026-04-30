@@ -1,25 +1,20 @@
 import { useMemo, useState } from 'react';
 import type { PlanEntry } from '../../types';
 import { PlanCard } from './PlanCard';
-import { PlanForm } from './PlanForm';
 import { formatDateJa, getYearMonth, formatDuration } from '../../utils/time';
 import { getAvailableMonths } from '../../utils/aggregate';
-import type { NewPlanInput } from '../../hooks/useEntries';
 
 interface Props {
   plans: PlanEntry[];
-  categories: string[];
-  onAddCategory: (cat: string) => void;
-  onUpdate: (id: string, input: NewPlanInput) => void;
+  onEdit: (plan: PlanEntry) => void;
   onDelete: (id: string) => void;
 }
 
-export function PlanList({ plans, categories, onAddCategory, onUpdate, onDelete }: Props) {
+export function PlanList({ plans, onEdit, onDelete }: Props) {
   const [filterMonth, setFilterMonth] = useState('');
-  const [editTarget, setEditTarget] = useState<PlanEntry | null>(null);
 
   const availableMonths = useMemo(
-    () => getAvailableMonths(plans.map((p) => ({ ...p, startTime: '', endTime: '', durationMinutes: 0 }))),
+    () => getAvailableMonths(plans.map((p) => ({ ...p, durationMinutes: 0 }))),
     [plans]
   );
 
@@ -39,31 +34,6 @@ export function PlanList({ plans, categories, onAddCategory, onUpdate, onDelete 
     }
     return Array.from(map.entries()).sort(([a], [b]) => b.localeCompare(a));
   }, [filtered]);
-
-  const handleEdit = (plan: PlanEntry) => {
-    setEditTarget(plan);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleUpdate = (input: NewPlanInput) => {
-    if (!editTarget) return;
-    onUpdate(editTarget.id, input);
-    setEditTarget(null);
-  };
-
-  if (editTarget) {
-    return (
-      <div className="space-y-4">
-        <PlanForm
-          categories={categories}
-          onAddCategory={onAddCategory}
-          onSubmit={handleUpdate}
-          editTarget={editTarget}
-          onCancelEdit={() => setEditTarget(null)}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -100,7 +70,7 @@ export function PlanList({ plans, categories, onAddCategory, onUpdate, onDelete 
                 <PlanCard
                   key={plan.id}
                   plan={plan}
-                  onEdit={handleEdit}
+                  onEdit={onEdit}
                   onDelete={onDelete}
                 />
               ))}

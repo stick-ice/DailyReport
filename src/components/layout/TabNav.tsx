@@ -1,4 +1,4 @@
-type Tab = 'form' | 'list' | 'plan' | 'analytics' | 'categories';
+type Tab = 'daily' | 'analytics' | 'categories';
 
 interface Props {
   active: Tab;
@@ -6,9 +6,7 @@ interface Props {
 }
 
 const tabs: { id: Tab; label: string }[] = [
-  { id: 'form', label: '実績入力' },
-  { id: 'list', label: '実績一覧' },
-  { id: 'plan', label: '作業計画' },
+  { id: 'daily', label: '日報' },
   { id: 'analytics', label: '分析' },
   { id: 'categories', label: 'カテゴリ' },
 ];
