@@ -10,8 +10,19 @@ export interface TaskEntry {
   updatedAt: string;
 }
 
+export interface PlanEntry {
+  id: string;
+  date: string;               // "YYYY-MM-DD"
+  category: string;
+  description: string;
+  estimatedMinutes: number;   // planned duration
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppState {
   entries: TaskEntry[];
+  plans: PlanEntry[];
   categories: string[];
 }
 

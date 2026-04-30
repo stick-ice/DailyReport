@@ -5,6 +5,7 @@ const STORAGE_KEY = 'dailyreport_v1';
 
 const DEFAULT_STATE: AppState = {
   entries: [],
+  plans: [],
   categories: [...PREDEFINED_CATEGORIES],
 };
 
@@ -20,10 +21,11 @@ export function loadState(): AppState {
       for (const c of parsed.customCategories) {
         if (!merged.includes(c)) merged.push(c);
       }
-      return { entries: Array.isArray(parsed.entries) ? parsed.entries : [], categories: merged };
+      return { entries: Array.isArray(parsed.entries) ? parsed.entries : [], plans: [], categories: merged };
     }
     return {
       entries: Array.isArray(parsed.entries) ? parsed.entries : [],
+      plans: Array.isArray(parsed.plans) ? parsed.plans : [],
       categories: Array.isArray(parsed.categories) && parsed.categories.length > 0
         ? parsed.categories
         : [...PREDEFINED_CATEGORIES],
