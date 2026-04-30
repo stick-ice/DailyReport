@@ -4,7 +4,7 @@ import type { TaskEntry, PlanEntry, AppState } from '../types';
 import { computeDurationMinutes } from '../utils/time';
 
 export type NewEntryInput = Omit<TaskEntry, 'id' | 'durationMinutes' | 'createdAt' | 'updatedAt'>;
-export type NewPlanInput = Omit<PlanEntry, 'id' | 'createdAt' | 'updatedAt'>;
+export type NewPlanInput = Omit<PlanEntry, 'id' | 'estimatedMinutes' | 'createdAt' | 'updatedAt'>;
 
 export function useEntries() {
   const { state, setState } = useLocalStorage();
@@ -77,6 +77,7 @@ export function useEntries() {
     const plan: PlanEntry = {
       ...input,
       id: crypto.randomUUID(),
+      estimatedMinutes: computeDurationMinutes(input.startTime, input.endTime),
       createdAt: now,
       updatedAt: now,
     };
@@ -88,7 +89,9 @@ export function useEntries() {
     setState((prev: AppState) => ({
       ...prev,
       plans: prev.plans.map((p) =>
-        p.id === id ? { ...p, ...input, updatedAt: now } : p
+        p.id === id
+          ? { ...p, ...input, estimatedMinutes: computeDurationMinutes(input.startTime, input.endTime), updatedAt: now }
+          : p
       ),
     }));
   }, [setState]);

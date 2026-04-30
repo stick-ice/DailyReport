@@ -13,9 +13,11 @@ export interface TaskEntry {
 export interface PlanEntry {
   id: string;
   date: string;               // "YYYY-MM-DD"
+  startTime: string;          // "HH:MM" 24h
+  endTime: string;            // "HH:MM" 24h
+  estimatedMinutes: number;   // computed from startTime/endTime
   category: string;
   description: string;
-  estimatedMinutes: number;   // planned duration
   createdAt: string;
   updatedAt: string;
 }

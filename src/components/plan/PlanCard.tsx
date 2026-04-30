@@ -16,7 +16,10 @@ export function PlanCard({ plan, onEdit, onDelete }: Props) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-2">
-            <span className="text-xs text-gray-400">予定 {formatDuration(plan.estimatedMinutes)}</span>
+            <span className="text-sm font-medium text-gray-700">
+              {plan.startTime} - {plan.endTime}
+            </span>
+            <span className="text-xs text-gray-400">({formatDuration(plan.estimatedMinutes)})</span>
             <span className="inline-block rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
               {plan.category}
             </span>

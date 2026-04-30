@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { TimeInput } from '../form/TimeInput';
 import { DateInput } from '../form/DateInput';
 import { CategorySelect } from '../form/CategorySelect';
-import { todayString } from '../../utils/time';
+import { isValidTime, todayString } from '../../utils/time';
 import type { NewPlanInput } from '../../hooks/useEntries';
 import type { PlanEntry } from '../../types';
 
@@ -15,43 +16,38 @@ interface Props {
 
 interface FormErrors {
   date?: string;
+  startTime?: string;
+  endTime?: string;
   category?: string;
   description?: string;
-  estimatedMinutes?: string;
 }
 
-const emptyForm = (): Omit<NewPlanInput, 'estimatedMinutes'> & { hours: string; minutes: string } => ({
+const emptyForm = (): NewPlanInput => ({
   date: todayString(),
+  startTime: '',
+  endTime: '',
   category: '',
   description: '',
-  hours: '',
-  minutes: '',
 });
 
-function splitMinutes(total: number): { hours: string; minutes: string } {
-  return {
-    hours: String(Math.floor(total / 60)),
-    minutes: String(total % 60),
-  };
-}
-
 export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCancelEdit }: Props) {
-  const [form, setForm] = useState(() =>
+  const [form, setForm] = useState<NewPlanInput>(() =>
     editTarget
       ? {
           date: editTarget.date,
+          startTime: editTarget.startTime,
+          endTime: editTarget.endTime,
           category: editTarget.category,
           description: editTarget.description,
-          ...splitMinutes(editTarget.estimatedMinutes),
         }
       : emptyForm()
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
+  const set = <K extends keyof NewPlanInput>(key: K, value: NewPlanInput[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    if (key in errors) {
+    if (errors[key as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [key]: undefined }));
     }
   };
@@ -59,14 +55,18 @@ export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCa
   const validate = (): FormErrors => {
     const errs: FormErrors = {};
     if (!form.date) errs.date = '日付を入力してください';
+    if (!form.startTime) {
+      errs.startTime = '開始時刻を入力してください';
+    } else if (!isValidTime(form.startTime)) {
+      errs.startTime = 'HH:MM 形式で入力してください';
+    }
+    if (!form.endTime) {
+      errs.endTime = '終了時刻を入力してください';
+    } else if (!isValidTime(form.endTime)) {
+      errs.endTime = 'HH:MM 形式で入力してください';
+    }
     if (!form.category) errs.category = 'カテゴリを選択してください';
     if (!form.description.trim()) errs.description = '業務概要を入力してください';
-
-    const h = form.hours === '' ? 0 : parseInt(form.hours, 10);
-    const m = form.minutes === '' ? 0 : parseInt(form.minutes, 10);
-    if (isNaN(h) || isNaN(m) || h < 0 || m < 0 || m > 59 || (h === 0 && m === 0)) {
-      errs.estimatedMinutes = '予定時間を正しく入力してください（0分より大きい値）';
-    }
     return errs;
   };
 
@@ -77,14 +77,7 @@ export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCa
       setErrors(errs);
       return;
     }
-    const h = form.hours === '' ? 0 : parseInt(form.hours, 10);
-    const m = form.minutes === '' ? 0 : parseInt(form.minutes, 10);
-    onSubmit({
-      date: form.date,
-      category: form.category,
-      description: form.description,
-      estimatedMinutes: h * 60 + m,
-    });
+    onSubmit(form);
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 2000);
     if (!editTarget) {
@@ -107,6 +100,21 @@ export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCa
           error={errors.date}
         />
 
+        <div className="flex gap-4 flex-wrap">
+          <TimeInput
+            label="開始時刻"
+            value={form.startTime}
+            onChange={(v) => set('startTime', v)}
+            error={errors.startTime}
+          />
+          <TimeInput
+            label="終了時刻"
+            value={form.endTime}
+            onChange={(v) => set('endTime', v)}
+            error={errors.endTime}
+          />
+        </div>
+
         <CategorySelect
           value={form.category}
           categories={categories}
@@ -115,41 +123,6 @@ export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCa
           error={errors.category}
         />
 
-        {/* 予定時間 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">予定時間</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              min="0"
-              max="23"
-              value={form.hours}
-              onChange={(e) => set('hours', e.target.value)}
-              placeholder="0"
-              className={`w-20 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.estimatedMinutes ? 'border-red-400' : 'border-gray-300'
-              }`}
-            />
-            <span className="text-sm text-gray-600">時間</span>
-            <input
-              type="number"
-              min="0"
-              max="59"
-              value={form.minutes}
-              onChange={(e) => set('minutes', e.target.value)}
-              placeholder="0"
-              className={`w-20 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.estimatedMinutes ? 'border-red-400' : 'border-gray-300'
-              }`}
-            />
-            <span className="text-sm text-gray-600">分</span>
-          </div>
-          {errors.estimatedMinutes && (
-            <p className="mt-1 text-xs text-red-500">{errors.estimatedMinutes}</p>
-          )}
-        </div>
-
-        {/* 業務概要 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">業務概要</label>
           <textarea
