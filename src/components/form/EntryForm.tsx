@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TimeInput } from './TimeInput';
 import { DateInput } from './DateInput';
 import { CategorySelect } from './CategorySelect';
@@ -44,6 +44,21 @@ export function EntryForm({ categories, onAddCategory, onSubmit, editTarget, onC
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (editTarget) {
+      setForm({
+        date: editTarget.date,
+        startTime: editTarget.startTime,
+        endTime: editTarget.endTime,
+        category: editTarget.category,
+        description: editTarget.description,
+      });
+    } else {
+      setForm((prev) => ({ ...emptyForm(), date: prev.date }));
+    }
+    setErrors({});
+  }, [editTarget]);
 
   const set = <K extends keyof NewEntryInput>(key: K, value: NewEntryInput[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TimeInput } from '../form/TimeInput';
 import { DateInput } from '../form/DateInput';
 import { CategorySelect } from '../form/CategorySelect';
@@ -44,6 +44,21 @@ export function PlanForm({ categories, onAddCategory, onSubmit, editTarget, onCa
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (editTarget) {
+      setForm({
+        date: editTarget.date,
+        startTime: editTarget.startTime,
+        endTime: editTarget.endTime,
+        category: editTarget.category,
+        description: editTarget.description,
+      });
+    } else {
+      setForm((prev) => ({ ...emptyForm(), date: prev.date }));
+    }
+    setErrors({});
+  }, [editTarget]);
 
   const set = <K extends keyof NewPlanInput>(key: K, value: NewPlanInput[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
