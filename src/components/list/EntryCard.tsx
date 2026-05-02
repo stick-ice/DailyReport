@@ -8,6 +8,28 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+
+function renderDescription(text: string) {
+  const parts = text.split(URL_REGEX);
+  return parts.map((part, i) =>
+    URL_REGEX.test(part) ? (
+      <a
+        key={i}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 underline hover:text-blue-800 break-all"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    )
+  );
+}
+
 export function EntryCard({ entry, onEdit, onDelete }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -24,7 +46,7 @@ export function EntryCard({ entry, onEdit, onDelete }: Props) {
               {entry.category}
             </span>
           </div>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">{entry.description}</p>
+          <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">{renderDescription(entry.description)}</p>
         </div>
         <div className="flex gap-1 shrink-0">
           {!confirmDelete ? (
