@@ -5,6 +5,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  type PieSectorDataItem,
 } from 'recharts';
 import { formatDuration } from '../../utils/time';
 
@@ -16,6 +17,7 @@ interface DataItem {
 
 interface Props {
   data: DataItem[];
+  onCategoryClick?: (category: string) => void;
 }
 
 const COLORS = [
@@ -35,7 +37,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   );
 }
 
-export function CategoryPieChart({ data }: Props) {
+export function CategoryPieChart({ data, onCategoryClick }: Props) {
   if (data.length === 0) {
     return <p className="text-center text-gray-400 py-10">データがありません</p>;
   }
@@ -52,6 +54,11 @@ export function CategoryPieChart({ data }: Props) {
           outerRadius={90}
           label={({ percent }) => percent != null ? `${(percent * 100).toFixed(0)}%` : ''}
           labelLine={false}
+          style={onCategoryClick ? { cursor: 'pointer' } : undefined}
+          onClick={(data: PieSectorDataItem) => {
+            const category = data?.payload?.category;
+            if (category) onCategoryClick?.(category);
+          }}
         >
           {data.map((_, index) => (
             <Cell key={index} fill={COLORS[index % COLORS.length]} />

@@ -3,8 +3,9 @@ import type { TaskEntry } from '../../types';
 import { useAggregates } from '../../hooks/useAggregates';
 import { CategoryBarChart } from './CategoryBarChart';
 import { CategoryPieChart } from './CategoryPieChart';
+import { CategoryDetailModal } from './CategoryDetailModal';
 import { DailyAreaChart } from './DailyAreaChart';
-import { formatDuration, formatYearMonthJa, currentYearMonth } from '../../utils/time';
+import { formatDuration, formatYearMonthJa, currentYearMonth, getYearMonth } from '../../utils/time';
 import { getAvailableMonths } from '../../utils/aggregate';
 
 interface Props {
@@ -25,10 +26,18 @@ function nextMonth(ym: string): string {
 
 export function AnalyticsView({ entries }: Props) {
   const [yearMonth, setYearMonth] = useState(currentYearMonth);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { aggregate, categoryChartData, dailyChartData } = useAggregates(entries, yearMonth);
   const availableMonths = getAvailableMonths(entries);
 
   const topCategory = categoryChartData.length > 0 ? categoryChartData[0].category : '—';
+
+  const modalEntries = selectedCategory
+    ? entries.filter(
+        (e) => e.category === selectedCategory && getYearMonth(e.date) === yearMonth
+      )
+    : [];
+  const modalTotalMinutes = modalEntries.reduce((sum, e) => sum + e.durationMinutes, 0);
 
   return (
     <div className="space-y-4">
@@ -84,14 +93,16 @@ export function AnalyticsView({ entries }: Props) {
 
       {/* カテゴリ別時間（棒グラフ） */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <h3 className="text-sm font-semibold text-gray-700 mb-4">カテゴリ別作業時間</h3>
-        <CategoryBarChart data={categoryChartData} />
+        <h3 className="text-sm font-semibold text-gray-700 mb-1">カテゴリ別作業時間</h3>
+        <p className="text-xs text-gray-400 mb-4">クリックで実績の詳細を表示</p>
+        <CategoryBarChart data={categoryChartData} onCategoryClick={setSelectedCategory} />
       </div>
 
       {/* カテゴリ構成比（円グラフ） */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <h3 className="text-sm font-semibold text-gray-700 mb-4">カテゴリ構成比</h3>
-        <CategoryPieChart data={categoryChartData} />
+        <h3 className="text-sm font-semibold text-gray-700 mb-1">カテゴリ構成比</h3>
+        <p className="text-xs text-gray-400 mb-4">クリックで実績の詳細を表示</p>
+        <CategoryPieChart data={categoryChartData} onCategoryClick={setSelectedCategory} />
       </div>
 
       {/* 日別作業時間（エリアグラフ） */}
@@ -99,6 +110,14 @@ export function AnalyticsView({ entries }: Props) {
         <h3 className="text-sm font-semibold text-gray-700 mb-4">日別作業時間</h3>
         <DailyAreaChart data={dailyChartData} />
       </div>
+      {selectedCategory && (
+        <CategoryDetailModal
+          category={selectedCategory}
+          entries={modalEntries}
+          totalMinutes={modalTotalMinutes}
+          onClose={() => setSelectedCategory(null)}
+        />
+      )}
     </div>
   );
 }
