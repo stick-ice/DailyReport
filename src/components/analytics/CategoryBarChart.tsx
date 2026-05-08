@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  type BarRectangleItem,
 } from 'recharts';
 import { formatDuration } from '../../utils/time';
 
@@ -18,6 +19,7 @@ interface DataItem {
 
 interface Props {
   data: DataItem[];
+  onCategoryClick?: (category: string) => void;
 }
 
 const COLORS = [
@@ -36,14 +38,18 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   );
 }
 
-export function CategoryBarChart({ data }: Props) {
+export function CategoryBarChart({ data, onCategoryClick }: Props) {
   if (data.length === 0) {
     return <p className="text-center text-gray-400 py-10">データがありません</p>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+      <BarChart
+        data={data}
+        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+        style={onCategoryClick ? { cursor: 'pointer' } : undefined}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis
           dataKey="category"
@@ -56,7 +62,14 @@ export function CategoryBarChart({ data }: Props) {
           width={35}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="hours" radius={[4, 4, 0, 0]}>
+        <Bar
+          dataKey="hours"
+          radius={[4, 4, 0, 0]}
+          onClick={(data: BarRectangleItem) => {
+            const category = data?.payload?.category;
+            if (category) onCategoryClick?.(category);
+          }}
+        >
           {data.map((_, index) => (
             <Cell key={index} fill={COLORS[index % COLORS.length]} />
           ))}
