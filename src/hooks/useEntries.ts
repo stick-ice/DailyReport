@@ -72,6 +72,15 @@ export function useEntries() {
     }));
   }, [setState]);
 
+  const reorderCategories = useCallback((fromIndex: number, toIndex: number) => {
+    setState((prev: AppState) => {
+      const cats = [...prev.categories];
+      const [moved] = cats.splice(fromIndex, 1);
+      cats.splice(toIndex, 0, moved);
+      return { ...prev, categories: cats };
+    });
+  }, [setState]);
+
   const addPlan = useCallback((input: NewPlanInput) => {
     const now = new Date().toISOString();
     const plan: PlanEntry = {
@@ -113,6 +122,7 @@ export function useEntries() {
     addCategory,
     editCategory,
     deleteCategory,
+    reorderCategories,
     addPlan,
     updatePlan,
     deletePlan,

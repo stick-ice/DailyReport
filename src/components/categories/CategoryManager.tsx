@@ -5,9 +5,10 @@ interface Props {
   onAdd: (category: string) => void;
   onEdit: (oldName: string, newName: string) => void;
   onDelete: (category: string) => void;
+  onReorder: (fromIndex: number, toIndex: number) => void;
 }
 
-export function CategoryManager({ categories, onAdd, onEdit, onDelete }: Props) {
+export function CategoryManager({ categories, onAdd, onEdit, onDelete, onReorder }: Props) {
   const [newInput, setNewInput] = useState('');
   const [editingName, setEditingName] = useState<string | null>(null);
   const [editInput, setEditInput] = useState('');
@@ -71,7 +72,7 @@ export function CategoryManager({ categories, onAdd, onEdit, onDelete }: Props) 
         <p className="text-sm text-gray-400 text-center py-4">カテゴリがありません</p>
       ) : (
         <ul className="space-y-2">
-          {categories.map((cat) => (
+          {categories.map((cat, index) => (
             <li key={cat} className="rounded-lg border border-gray-200 px-3 py-2">
               {editingName === cat ? (
                 <div className="flex gap-2 items-center">
@@ -119,7 +120,27 @@ export function CategoryManager({ categories, onAdd, onEdit, onDelete }: Props) 
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{cat}</span>
+                  <div className="flex items-center gap-1">
+                    <div className="flex flex-col">
+                      <button
+                        onClick={() => onReorder(index, index - 1)}
+                        disabled={index === 0}
+                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors leading-none"
+                        aria-label="上へ移動"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => onReorder(index, index + 1)}
+                        disabled={index === categories.length - 1}
+                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors leading-none"
+                        aria-label="下へ移動"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                    <span className="text-sm text-gray-700">{cat}</span>
+                  </div>
                   <div className="flex gap-1">
                     <button
                       onClick={() => startEdit(cat)}
