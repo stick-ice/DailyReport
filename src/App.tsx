@@ -12,7 +12,7 @@ export default function App() {
   const {
     entries, plans, categories,
     addEntry, updateEntry, deleteEntry,
-    addCategory, editCategory, deleteCategory,
+    addCategory, editCategory, deleteCategory, reorderCategories,
     addPlan, updatePlan, deletePlan,
   } = useEntries();
 
@@ -51,6 +51,7 @@ export default function App() {
             onAdd={addCategory}
             onEdit={editCategory}
             onDelete={deleteCategory}
+            onReorder={reorderCategories}
           />
         )}
       </main>
