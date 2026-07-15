@@ -5,6 +5,7 @@ import { PlanList } from '../plan/PlanList';
 import { EntryForm } from '../form/EntryForm';
 import { EntryList } from '../list/EntryList';
 import type { NewEntryInput, NewPlanInput } from '../../hooks/useEntries';
+import { getYearMonth } from '../../utils/time';
 
 interface Props {
   entries: TaskEntry[];
@@ -25,18 +26,31 @@ export function DailyView({
   onAddPlan, onUpdatePlan, onDeletePlan,
 }: Props) {
   const [filterDate, setFilterDate] = useState('');
+  const [filterMonth, setFilterMonth] = useState('');
   const [editEntry, setEditEntry] = useState<TaskEntry | null>(null);
   const [editPlan, setEditPlan] = useState<PlanEntry | null>(null);
 
-  const filteredEntries = useMemo(
-    () => filterDate ? entries.filter((e) => e.date === filterDate) : entries,
-    [entries, filterDate]
-  );
+  const handleFilterDateChange = (value: string) => {
+    setFilterDate(value);
+    if (value) setFilterMonth('');
+  };
 
-  const filteredPlans = useMemo(
-    () => filterDate ? plans.filter((p) => p.date === filterDate) : plans,
-    [plans, filterDate]
-  );
+  const handleFilterMonthChange = (value: string) => {
+    setFilterMonth(value);
+    if (value) setFilterDate('');
+  };
+
+  const filteredEntries = useMemo(() => {
+    if (filterDate) return entries.filter((e) => e.date === filterDate);
+    if (filterMonth) return entries.filter((e) => getYearMonth(e.date) === filterMonth);
+    return entries;
+  }, [entries, filterDate, filterMonth]);
+
+  const filteredPlans = useMemo(() => {
+    if (filterDate) return plans.filter((p) => p.date === filterDate);
+    if (filterMonth) return plans.filter((p) => getYearMonth(p.date) === filterMonth);
+    return plans;
+  }, [plans, filterDate, filterMonth]);
 
   const handleEntrySubmit = (input: NewEntryInput) => {
     if (editEntry) {
@@ -68,23 +82,42 @@ export function DailyView({
 
   return (
     <div className="space-y-4">
-      {/* 共有日付フィルター */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 flex items-center gap-3">
-        <label className="text-sm font-medium text-gray-700 shrink-0">日付で絞り込み</label>
-        <input
-          type="date"
-          value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {filterDate && (
-          <button
-            onClick={() => setFilterDate('')}
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            クリア
-          </button>
-        )}
+      {/* 共有日付・月フィルター */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+        <div className="flex items-center gap-3">
+          <label className="text-sm font-medium text-gray-700 shrink-0">日付で絞り込み</label>
+          <input
+            type="date"
+            value={filterDate}
+            onChange={(e) => handleFilterDateChange(e.target.value)}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {filterDate && (
+            <button
+              onClick={() => setFilterDate('')}
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              クリア
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <label className="text-sm font-medium text-gray-700 shrink-0">月で絞り込み</label>
+          <input
+            type="month"
+            value={filterMonth}
+            onChange={(e) => handleFilterMonthChange(e.target.value)}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {filterMonth && (
+            <button
+              onClick={() => setFilterMonth('')}
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              クリア
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 2カラム */}
