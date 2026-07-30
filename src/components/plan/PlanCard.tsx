@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import type { PlanEntry } from '../../types';
 import { formatDuration } from '../../utils/time';
-
-const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+import { URL_REGEX, extractLinkLabel } from '../../utils/url';
 
 function renderDescription(text: string) {
   const parts = text.split(URL_REGEX);
@@ -13,10 +12,11 @@ function renderDescription(text: string) {
         href={part}
         target="_blank"
         rel="noopener noreferrer"
+        title={part}
         className="text-blue-600 underline hover:text-blue-800 break-all"
         onClick={(e) => e.stopPropagation()}
       >
-        {part}
+        {extractLinkLabel(part)}
       </a>
     ) : (
       part
